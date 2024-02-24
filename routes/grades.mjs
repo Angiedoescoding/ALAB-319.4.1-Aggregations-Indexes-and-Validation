@@ -8,7 +8,7 @@ const router = express.Router();
 //Get all route
 router.get('/', async (req, res) => {
   let collection = await db.collection('grades');
-  let result = await collection.find({}).limit(10).toArray();
+  let result = await collection.find({}).limit(10).toArray();     // limiting to 10 to avoid a long wait
   res.json(result);
 });
 
@@ -47,6 +47,37 @@ router.get('/learner/:learnerID', async (req, res) => {
   else res.send(result).status(200);
 });
 
+
+// Create a GET route at /grades/stats --- calculating stats over 70$
+router.get('/stats', async (req, res) => {
+  let collection = await db.collection('grades');
+  let stats = await collection.aggregate([
+    {
+      $group: {
+        _id: "$student_id",       // or $student_id // $learner_id
+        numOver70: { $sum: {
+        $cond: [{ $gt: [{ $avg: "$scores,score"}, 70]}, 1, 0]    // comparing scores with 70; 1 and 0 in the $cond are either true (over 70) or false (less than 70)
+        } 
+      },
+      totalLearners: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: "$student_id",       // or $student_id //  $learner_id
+        numOver70: 1,
+        totalLearners: 1,
+        persentOver70: {
+          $multiply: [{ $divide: ["$numOver70", "$totalLearners"] }, 100]     // 100 - divide since looking for %
+          }
+      }
+    }
+  ]).toArray();
+
+  res.json(stats[0].status(200));
+});
+
+
 //Delete a learner by id
 router.delete('/learner/:learnerID', async (req, res)=>{
   let collection = await db.collection('grades');
@@ -67,6 +98,7 @@ router.get('/class/:classID', async (req, res) => {
   if (!result) res.status(404).send('Not found');
   else res.json(result).status(200);
 });
+
 
 //Update a class_id PATCH
 router.patch('/class/:classID', async (req, res) => {
