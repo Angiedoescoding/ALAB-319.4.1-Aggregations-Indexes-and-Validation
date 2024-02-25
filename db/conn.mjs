@@ -27,12 +27,18 @@ let db = conn.db('sample_training');
 
 
 try {
-  await db. collection('grades').createIndex({ "class_id": 1 });      // Create a single-field index on class_id
-  await db. collection('grades').createIndex({ "learner_id": 1 });  // Create a single-field index on learner_id.
-  await db. collection('grades').createIndex({ "learner_id": 1, "class_id": 1 });  // Create a compound index on learner_id and class_id, in that order, both ascending.
+  await db.collection('grades').createIndex({ "class_id": 1 });      // Create a single-field index on class_id
+  await db.collection('grades').createIndex({ "learner_id": 1 });  // Create a single-field index on learner_id.
+  await db.collection('grades').createIndex({ "learner_id": 1, "class_id": 1 });  // Create a compound index on learner_id and class_id, in that order, both ascending.
 } catch (e) {
   console.error(e); 
 }
+
+
+// Create the following validation rules on the grades collection:
+    // Each document must have a class_id field, which must be an integer between 0 and 300, inclusive.
+    // Each document must have a learner_id field, which must be an integer greater than or equal to 0.
+
 
 
 
