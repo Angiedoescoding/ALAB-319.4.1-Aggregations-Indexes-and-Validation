@@ -77,6 +77,25 @@ router.get('/stats', async (req, res) => {
   res.json(stats[0].status(200));
 });
 
+// Create a GET route at /grades/stats/:id --->>> need to review again
+
+// router.get('/stats/:id', async (req, res) => {
+//   let classID = parseInt(req.params.id);
+//   let collection = await db.collection('grades');
+//   let stats = await collection.aggregate([
+//     { match: { class_id: classID} },          // Match documents with the specified class_id
+//     {
+//       $group: {
+//         id: "$student_id",
+
+//       }
+//     }
+//   ])
+// })
+
+
+
+
 
 //Delete a learner by id
 router.delete('/learner/:learnerID', async (req, res)=>{
